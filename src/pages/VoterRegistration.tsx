@@ -36,8 +36,8 @@ const VoterRegistration = () => {
     }
     
     toast({
-      title: "Registration Submitted",
-      description: "Your voter registration has been submitted for processing. You'll receive confirmation within 48 hours.",
+      title: "Registration Complete",
+      description: "Your voter registration has been approved! You can now participate in elections.",
       variant: "default",
     });
   };
