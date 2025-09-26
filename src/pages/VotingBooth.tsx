@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Vote, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { Vote, CheckCircle, AlertCircle, Clock, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import ballotIcon from "@/assets/ballot-icon.jpg";
 
 interface Candidate {
@@ -24,9 +25,12 @@ interface Race {
 
 const VotingBooth = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [currentRaceIndex, setCurrentRaceIndex] = useState(0);
   const [votes, setVotes] = useState<Record<string, string>>({});
   const [isVotingComplete, setIsVotingComplete] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [showRegistrationCheck, setShowRegistrationCheck] = useState(true);
 
   const races: Race[] = [
     {
@@ -129,6 +133,71 @@ const VotingBooth = () => {
       setCurrentRaceIndex(prev => prev - 1);
     }
   };
+
+  const handleRegistrationConfirm = () => {
+    // In a real app, this would check against a database
+    setIsRegistered(true);
+    setShowRegistrationCheck(false);
+    toast({
+      title: "Registration Verified",
+      description: "Welcome to the voting booth. You may now cast your ballot.",
+      variant: "default",
+    });
+  };
+
+  const handleGoToRegistration = () => {
+    navigate("/register");
+  };
+
+  // Show registration check first
+  if (showRegistrationCheck) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center px-4">
+        <Card className="max-w-2xl w-full shadow-government text-center">
+          <CardHeader>
+            <div className="mx-auto w-16 h-16 bg-government-blue/10 rounded-full flex items-center justify-center mb-4">
+              <UserCheck className="h-8 w-8 text-government-blue" />
+            </div>
+            <CardTitle className="text-2xl">Voter Registration Required</CardTitle>
+            <CardDescription>
+              You must be registered to vote before accessing the voting booth
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-government-gray/30 rounded-lg p-6">
+              <h3 className="font-semibold mb-2">Registration Status Check</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Are you already registered to vote in this jurisdiction?
+              </p>
+              <div className="space-y-3">
+                <Button 
+                  variant="government" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleRegistrationConfirm}
+                >
+                  Yes, I'm Registered - Proceed to Vote
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleGoToRegistration}
+                >
+                  No, I Need to Register First
+                </Button>
+              </div>
+            </div>
+            
+            <div className="text-xs text-muted-foreground">
+              <p>Registration is required by law to participate in elections.</p>
+              <p>If you're unsure of your status, please register to ensure your eligibility.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isVotingComplete) {
     return (
