@@ -223,10 +223,20 @@ const VotingBooth = () => {
             </div>
             
             <div className="space-y-4">
-              <Button variant="government" size="lg" className="w-full">
+              <Button 
+                variant="government" 
+                size="lg" 
+                className="w-full"
+                onClick={() => navigate("/verify")}
+              >
                 View Receipt
               </Button>
-              <Button variant="outline" size="lg" className="w-full">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full"
+                onClick={() => navigate("/")}
+              >
                 Return to Home
               </Button>
             </div>
