@@ -72,6 +72,53 @@ const Verification = () => {
     }, 2000);
   };
 
+  const handleDownloadCertificate = () => {
+    if (!verificationResult) return;
+
+    // Create certificate content
+    const certificateContent = `
+OFFICIAL VOTE VERIFICATION CERTIFICATE
+======================================
+
+Ballot ID: ${verificationResult.ballotId}
+Timestamp: ${new Date(verificationResult.timestamp).toLocaleString()}
+Status: ${verificationResult.status.toUpperCase()}
+
+Block Hash: 0x4f3c2b1a9e8d7c6b5a4f3e2d1c0b9a8e7d6c5b4a
+Transaction ID: tx_789abc456def123ghi
+Confirmations: 24/24
+
+RECORDED VOTES:
+${verificationResult.races.map((race, i) => `
+${i + 1}. ${race.title}
+   Selection: ${race.selection}
+   Verified: ${race.verified ? 'YES' : 'NO'}
+`).join('')}
+
+This certificate confirms that your vote was securely recorded 
+on the blockchain and cannot be altered.
+
+Generated: ${new Date().toLocaleString()}
+    `.trim();
+
+    // Create blob and download
+    const blob = new Blob([certificateContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Vote-Certificate-${verificationResult.ballotId}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    toast({
+      title: "Certificate Downloaded",
+      description: "Your verification certificate has been saved.",
+      variant: "default",
+    });
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "verified":
@@ -214,7 +261,11 @@ const Verification = () => {
                     </div>
 
                     <div className="flex space-x-4">
-                      <Button variant="outline" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={handleDownloadCertificate}
+                      >
                         <FileText className="h-4 w-4 mr-2" />
                         Download Certificate
                       </Button>
