@@ -35,61 +35,61 @@ const VotingBooth = () => {
   const races: Race[] = [
     {
       id: "president",
-      title: "President of the United States",
+      title: "President of India",
       description: "Choose one candidate for President",
       candidates: [
         {
           id: "candidate-1",
-          name: "John Anderson",
-          party: "Democratic Party",
-          description: "Experienced leader focused on healthcare and education reform"
+          name: "Rajesh Kumar Sharma",
+          party: "Indian National Congress",
+          description: "Former Chief Minister focused on education and rural development"
         },
         {
           id: "candidate-2",
-          name: "Sarah Mitchell",
-          party: "Republican Party", 
-          description: "Business leader advocating for economic growth and security"
+          name: "Priya Patel",
+          party: "Bharatiya Janata Party", 
+          description: "Business leader advocating for economic growth and digital India"
         },
         {
           id: "candidate-3",
-          name: "Robert Chen",
-          party: "Independent",
-          description: "Reform candidate focused on government transparency"
+          name: "Arjun Singh",
+          party: "Aam Aadmi Party",
+          description: "Reform candidate focused on anti-corruption and transparency"
         }
       ]
     },
     {
-      id: "governor",
-      title: "Governor",
-      description: "Choose one candidate for Governor",
+      id: "chief-minister",
+      title: "Chief Minister of State",
+      description: "Choose one candidate for Chief Minister",
       candidates: [
         {
-          id: "gov-1",
-          name: "Maria Rodriguez",
-          party: "Democratic Party",
-          description: "Former senator with focus on infrastructure and environment"
+          id: "cm-1",
+          name: "Sunita Devi",
+          party: "Indian National Congress",
+          description: "Former MLA with focus on infrastructure and women's empowerment"
         },
         {
-          id: "gov-2",
-          name: "David Thompson",
-          party: "Republican Party",
-          description: "Former businessman advocating for lower taxes"
+          id: "cm-2",
+          name: "Vikram Reddy",
+          party: "Bharatiya Janata Party",
+          description: "Business leader advocating for industrial development"
         }
       ]
     },
     {
-      id: "proposition-1",
-      title: "Proposition 1: Education Funding",
-      description: "Shall the state increase education funding by $2 billion annually?",
+      id: "referendum-1",
+      title: "National Education Policy",
+      description: "Should the government increase education funding by ₹50,000 crore annually?",
       candidates: [
         {
-          id: "prop-yes",
+          id: "ref-yes",
           name: "YES",
           party: "Support",
-          description: "Increase funding for schools and teacher salaries"
+          description: "Increase funding for government schools and universities"
         },
         {
-          id: "prop-no",
+          id: "ref-no",
           name: "NO",
           party: "Oppose",
           description: "Maintain current funding levels"

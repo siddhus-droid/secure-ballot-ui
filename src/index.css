@@ -17,16 +17,16 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 220 100% 40%;
+    --primary: 26 85% 55%; /* Saffron/Orange */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 16% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 141 50% 40%; /* Indian Green */
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 0 72% 55%;
+    --accent: 217 91% 60%; /* Ashoka Chakra Blue */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -34,22 +34,24 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 220 100% 40%;
+    --ring: 26 85% 55%;
 
-    --success: 142 71% 45%;
+    --success: 141 50% 40%;
     --success-foreground: 0 0% 100%;
 
     --warning: 45 93% 58%;
     --warning-foreground: 0 0% 100%;
 
-    --government-blue: 220 100% 40%;
-    --government-red: 0 72% 55%;
+    --government-blue: 217 91% 60%; /* Ashoka Chakra Blue */
+    --government-red: 26 85% 55%; /* Saffron */
     --government-gray: 210 16% 96%;
+    --india-saffron: 26 85% 55%;
+    --india-green: 141 50% 40%;
 
-    --gradient-patriotic: linear-gradient(135deg, hsl(var(--government-blue)), hsl(var(--government-red)));
+    --gradient-patriotic: linear-gradient(135deg, hsl(var(--india-saffron)), hsl(var(--india-green)));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--government-gray)));
 
-    --shadow-government: 0 4px 20px hsla(var(--government-blue), 0.15);
+    --shadow-government: 0 4px 20px hsla(26, 85%, 55%, 0.15);
     --shadow-card: 0 2px 10px hsla(0, 0%, 0%, 0.1);
 
     --radius: 0.5rem;

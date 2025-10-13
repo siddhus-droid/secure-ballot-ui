@@ -60,6 +60,10 @@ export default {
           red: "hsl(var(--government-red))",
           gray: "hsl(var(--government-gray))",
         },
+        india: {
+          saffron: "hsl(var(--india-saffron))",
+          green: "hsl(var(--india-green))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
