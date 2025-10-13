@@ -119,6 +119,50 @@ Generated: ${new Date().toLocaleString()}
     });
   };
 
+  const handleShareVerification = async () => {
+    if (!verificationResult) return;
+
+    const shareText = `My vote has been verified on the blockchain!\n\nBallot ID: ${verificationResult.ballotId}\nTimestamp: ${new Date(verificationResult.timestamp).toLocaleString()}\nStatus: Verified ✓\n\nSecure E-Voting System`;
+    const shareUrl = window.location.href;
+
+    // Try to use native share API if available (mobile devices)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Vote Verification',
+          text: shareText,
+          url: shareUrl,
+        });
+        toast({
+          title: "Shared Successfully",
+          description: "Your verification has been shared.",
+          variant: "default",
+        });
+      } catch (err) {
+        // User cancelled share or error occurred
+        if (err instanceof Error && err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
+        toast({
+          title: "Link Copied",
+          description: "Verification details copied to clipboard.",
+          variant: "default",
+        });
+      } catch (err) {
+        toast({
+          title: "Copy Failed",
+          description: "Please copy the URL manually.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "verified":
@@ -269,7 +313,11 @@ Generated: ${new Date().toLocaleString()}
                         <FileText className="h-4 w-4 mr-2" />
                         Download Certificate
                       </Button>
-                      <Button variant="government" className="flex-1">
+                      <Button 
+                        variant="government" 
+                        className="flex-1"
+                        onClick={handleShareVerification}
+                      >
                         Share Verification
                       </Button>
                     </div>
