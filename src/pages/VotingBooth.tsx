@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Vote, CheckCircle, AlertCircle, Clock, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +32,9 @@ const VotingBooth = () => {
   const [isVotingComplete, setIsVotingComplete] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [showRegistrationCheck, setShowRegistrationCheck] = useState(true);
+  const [showVoterDetails, setShowVoterDetails] = useState(false);
+  const [voterName, setVoterName] = useState("");
+  const [voterPhone, setVoterPhone] = useState("");
 
   const races: Race[] = [
     {
@@ -135,12 +139,25 @@ const VotingBooth = () => {
   };
 
   const handleRegistrationConfirm = () => {
-    // In a real app, this would check against a database
-    setIsRegistered(true);
     setShowRegistrationCheck(false);
+    setShowVoterDetails(true);
+  };
+
+  const handleVoterDetailsSubmit = () => {
+    if (!voterName.trim() || !voterPhone.trim()) {
+      toast({
+        title: "Details Required",
+        description: "Please enter your name and phone number to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsRegistered(true);
+    setShowVoterDetails(false);
     toast({
-      title: "Registration Verified",
-      description: "Welcome to the voting booth. You may now cast your ballot.",
+      title: "Verification Complete",
+      description: `Welcome ${voterName}! You may now cast your ballot.`,
       variant: "default",
     });
   };
@@ -192,6 +209,76 @@ const VotingBooth = () => {
             <div className="text-xs text-muted-foreground">
               <p>Registration is required by law to participate in elections.</p>
               <p>If you're unsure of your status, please register to ensure your eligibility.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show voter details form if registered
+  if (showVoterDetails) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center px-4">
+        <Card className="max-w-2xl w-full shadow-government">
+          <CardHeader>
+            <div className="mx-auto w-16 h-16 bg-government-blue/10 rounded-full flex items-center justify-center mb-4">
+              <UserCheck className="h-8 w-8 text-government-blue" />
+            </div>
+            <CardTitle className="text-2xl text-center">Verify Your Identity</CardTitle>
+            <CardDescription className="text-center">
+              Please provide your registered details to proceed
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="voterName">Full Name (as registered)</Label>
+                <Input
+                  id="voterName"
+                  placeholder="Enter your full name"
+                  value={voterName}
+                  onChange={(e) => setVoterName(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="voterPhone">Phone Number</Label>
+                <Input
+                  id="voterPhone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={voterPhone}
+                  onChange={(e) => setVoterPhone(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full"
+                onClick={() => {
+                  setShowVoterDetails(false);
+                  setShowRegistrationCheck(true);
+                }}
+              >
+                Back
+              </Button>
+              <Button 
+                variant="government" 
+                size="lg" 
+                className="w-full"
+                onClick={handleVoterDetailsSubmit}
+              >
+                Verify & Continue
+              </Button>
+            </div>
+            
+            <div className="text-xs text-muted-foreground text-center">
+              <p>Your information will be verified against voter registration records.</p>
             </div>
           </CardContent>
         </Card>
