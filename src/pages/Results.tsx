@@ -24,26 +24,26 @@ const Results = () => {
   
   const raceResults: RaceResult[] = [
     {
-      title: "President of the United States",
+      title: "President of India",
       totalVotes: 2847329,
       status: "open",
       candidates: [
-        { name: "John Anderson", party: "Democratic", votes: 1423665, percentage: 52.1, color: "bg-government-blue" },
-        { name: "Sarah Mitchell", party: "Republican", votes: 1281234, percentage: 44.2, color: "bg-government-red" },
-        { name: "Robert Chen", party: "Independent", votes: 142430, percentage: 3.7, color: "bg-muted" }
+        { name: "Rajesh Kumar Sharma", party: "Indian National Congress", votes: 1423665, percentage: 52.1, color: "bg-government-blue" },
+        { name: "Priya Patel", party: "Bharatiya Janata Party", votes: 1281234, percentage: 44.2, color: "bg-government-red" },
+        { name: "Arjun Singh", party: "Aam Aadmi Party", votes: 142430, percentage: 3.7, color: "bg-muted" }
       ]
     },
     {
-      title: "Governor",
+      title: "Chief Minister of State",
       totalVotes: 2654891,
       status: "projected",
       candidates: [
-        { name: "Maria Rodriguez", party: "Democratic", votes: 1487623, percentage: 56.0, color: "bg-government-blue" },
-        { name: "David Thompson", party: "Republican", votes: 1167268, percentage: 44.0, color: "bg-government-red" }
+        { name: "Sunita Devi", party: "Indian National Congress", votes: 1487623, percentage: 56.0, color: "bg-government-blue" },
+        { name: "Vikram Reddy", party: "Bharatiya Janata Party", votes: 1167268, percentage: 44.0, color: "bg-government-red" }
       ]
     },
     {
-      title: "Proposition 1: Education Funding",
+      title: "National Education Policy",
       totalVotes: 2789156,
       status: "open",
       candidates: [
