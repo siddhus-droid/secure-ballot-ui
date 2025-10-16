@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const VoterRegistration = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,10 +28,30 @@ const VoterRegistration = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.agreed) {
       toast({
         title: "Agreement Required",
         description: "Please agree to the terms and conditions to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user is 18 years or older
+    const birthDate = new Date(formData.dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      toast({
+        title: "Age Requirement Not Met",
+        description: "You must be at least 18 years old to register to vote.",
         variant: "destructive",
       });
       return;
@@ -40,6 +62,11 @@ const VoterRegistration = () => {
       description: "Your voter registration has been approved! You can now participate in elections.",
       variant: "default",
     });
+
+    // Redirect to voting page after successful registration
+    setTimeout(() => {
+      navigate("/vote");
+    }, 1500);
   };
 
   const handleInputChange = (field: string, value: string) => {
