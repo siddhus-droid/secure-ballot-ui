@@ -21,6 +21,28 @@ interface RaceResult {
 
 const Results = () => {
   const lastUpdated = new Date().toLocaleTimeString();
+
+  const handleExportData = () => {
+    // Create CSV content
+    let csvContent = "Race,Candidate,Party,Votes,Percentage\n";
+    
+    raceResults.forEach(race => {
+      race.candidates.forEach(candidate => {
+        csvContent += `"${race.title}","${candidate.name}","${candidate.party}",${candidate.votes},${candidate.percentage}\n`;
+      });
+    });
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `election_results_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const raceResults: RaceResult[] = [
     {
@@ -140,7 +162,7 @@ const Results = () => {
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExportData}>
               <Download className="h-4 w-4 mr-2" />
               Export Data
             </Button>
