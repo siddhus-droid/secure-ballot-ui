@@ -107,6 +107,8 @@ const VoterRegistration = () => {
                         id="firstName"
                         value={formData.firstName}
                         onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        pattern="[A-Za-z\s]+"
+                        title="First name should only contain letters"
                         required
                       />
                     </div>
@@ -116,6 +118,8 @@ const VoterRegistration = () => {
                         id="lastName"
                         value={formData.lastName}
                         onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        pattern="[A-Za-z\s]+"
+                        title="Last name should only contain letters"
                         required
                       />
                     </div>
@@ -133,13 +137,16 @@ const VoterRegistration = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="ssn">Social Security Number</Label>
+                      <Label htmlFor="ssn">Aadhar Number</Label>
                       <Input
                         id="ssn"
-                        type="password"
-                        placeholder="XXX-XX-XXXX"
+                        type="text"
+                        placeholder="123456789012"
                         value={formData.ssn}
                         onChange={(e) => handleInputChange("ssn", e.target.value)}
+                        pattern="\d{12}"
+                        maxLength={12}
+                        title="Aadhar number must be exactly 12 digits"
                         required
                       />
                     </div>
@@ -162,6 +169,8 @@ const VoterRegistration = () => {
                         id="city"
                         value={formData.city}
                         onChange={(e) => handleInputChange("city", e.target.value)}
+                        pattern="[A-Za-z\s]+"
+                        title="City name should only contain letters"
                         required
                       />
                     </div>
@@ -185,6 +194,9 @@ const VoterRegistration = () => {
                         id="zipCode"
                         value={formData.zipCode}
                         onChange={(e) => handleInputChange("zipCode", e.target.value)}
+                        pattern="\d{6}"
+                        maxLength={6}
+                        title="ZIP code must be exactly 6 digits"
                         required
                       />
                     </div>
@@ -208,6 +220,9 @@ const VoterRegistration = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleInputChange("phone", e.target.value)}
+                        pattern="\d{10}"
+                        maxLength={10}
+                        title="Phone number must be exactly 10 digits"
                         required
                       />
                     </div>
@@ -247,7 +262,7 @@ const VoterRegistration = () => {
                 <ul className="space-y-2">
                   <li>• All data is encrypted with AES-256</li>
                   <li>• Information used only for voter verification</li>
-                  <li>• SSN stored securely and separately</li>
+                  <li>• Aadhar stored securely and separately</li>
                   <li>• Regular security audits performed</li>
                 </ul>
               </CardContent>
@@ -263,7 +278,7 @@ const VoterRegistration = () => {
               <CardContent className="text-sm text-muted-foreground">
                 <ul className="space-y-2">
                   <li>• Must be 18 years or older</li>
-                  <li>• Valid Social Security Number</li>
+                  <li>• Valid 12-digit Aadhar Number</li>
                   <li>• Current residential address</li>
                   <li>• Valid email for notifications</li>
                 </ul>
