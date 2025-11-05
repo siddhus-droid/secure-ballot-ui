@@ -180,11 +180,43 @@ const VoterRegistration = () => {
                         <SelectTrigger>
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ca">California</SelectItem>
-                          <SelectItem value="ny">New York</SelectItem>
-                          <SelectItem value="tx">Texas</SelectItem>
-                          <SelectItem value="fl">Florida</SelectItem>
+                        <SelectContent className="bg-background z-50">
+                          <SelectItem value="andhra-pradesh">Andhra Pradesh</SelectItem>
+                          <SelectItem value="arunachal-pradesh">Arunachal Pradesh</SelectItem>
+                          <SelectItem value="assam">Assam</SelectItem>
+                          <SelectItem value="bihar">Bihar</SelectItem>
+                          <SelectItem value="chhattisgarh">Chhattisgarh</SelectItem>
+                          <SelectItem value="goa">Goa</SelectItem>
+                          <SelectItem value="gujarat">Gujarat</SelectItem>
+                          <SelectItem value="haryana">Haryana</SelectItem>
+                          <SelectItem value="himachal-pradesh">Himachal Pradesh</SelectItem>
+                          <SelectItem value="jharkhand">Jharkhand</SelectItem>
+                          <SelectItem value="karnataka">Karnataka</SelectItem>
+                          <SelectItem value="kerala">Kerala</SelectItem>
+                          <SelectItem value="madhya-pradesh">Madhya Pradesh</SelectItem>
+                          <SelectItem value="maharashtra">Maharashtra</SelectItem>
+                          <SelectItem value="manipur">Manipur</SelectItem>
+                          <SelectItem value="meghalaya">Meghalaya</SelectItem>
+                          <SelectItem value="mizoram">Mizoram</SelectItem>
+                          <SelectItem value="nagaland">Nagaland</SelectItem>
+                          <SelectItem value="odisha">Odisha</SelectItem>
+                          <SelectItem value="punjab">Punjab</SelectItem>
+                          <SelectItem value="rajasthan">Rajasthan</SelectItem>
+                          <SelectItem value="sikkim">Sikkim</SelectItem>
+                          <SelectItem value="tamil-nadu">Tamil Nadu</SelectItem>
+                          <SelectItem value="telangana">Telangana</SelectItem>
+                          <SelectItem value="tripura">Tripura</SelectItem>
+                          <SelectItem value="uttar-pradesh">Uttar Pradesh</SelectItem>
+                          <SelectItem value="uttarakhand">Uttarakhand</SelectItem>
+                          <SelectItem value="west-bengal">West Bengal</SelectItem>
+                          <SelectItem value="andaman-nicobar">Andaman and Nicobar Islands</SelectItem>
+                          <SelectItem value="chandigarh">Chandigarh</SelectItem>
+                          <SelectItem value="dadra-nagar-haveli">Dadra and Nagar Haveli and Daman and Diu</SelectItem>
+                          <SelectItem value="delhi">Delhi</SelectItem>
+                          <SelectItem value="jammu-kashmir">Jammu and Kashmir</SelectItem>
+                          <SelectItem value="ladakh">Ladakh</SelectItem>
+                          <SelectItem value="lakshadweep">Lakshadweep</SelectItem>
+                          <SelectItem value="puducherry">Puducherry</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
