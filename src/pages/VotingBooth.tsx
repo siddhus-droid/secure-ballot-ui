@@ -239,7 +239,10 @@ const VotingBooth = () => {
                   placeholder="Enter your full name"
                   value={voterName}
                   onChange={(e) => setVoterName(e.target.value)}
+                  pattern="[A-Za-z\s]+"
+                  title="Name should only contain letters"
                   className="mt-1"
+                  required
                 />
               </div>
               <div>
@@ -250,7 +253,11 @@ const VotingBooth = () => {
                   placeholder="Enter your phone number"
                   value={voterPhone}
                   onChange={(e) => setVoterPhone(e.target.value)}
+                  pattern="\d{10}"
+                  maxLength={10}
+                  title="Phone number must be exactly 10 digits"
                   className="mt-1"
+                  required
                 />
               </div>
             </div>
