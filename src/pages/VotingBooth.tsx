@@ -409,11 +409,6 @@ const VotingBooth = () => {
             Previous
           </Button>
           
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span>Session expires in 45:00</span>
-          </div>
-          
           <Button
             variant="government"
             onClick={handleNext}
