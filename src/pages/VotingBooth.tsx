@@ -238,7 +238,13 @@ const VotingBooth = () => {
                   id="voterName"
                   placeholder="Enter your full name"
                   value={voterName}
-                  onChange={(e) => setVoterName(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow letters and spaces
+                    if (/^[A-Za-z\s]*$/.test(value)) {
+                      setVoterName(value);
+                    }
+                  }}
                   pattern="[A-Za-z\s]+"
                   title="Name should only contain letters"
                   className="mt-1"
@@ -252,7 +258,13 @@ const VotingBooth = () => {
                   type="tel"
                   placeholder="Enter your phone number"
                   value={voterPhone}
-                  onChange={(e) => setVoterPhone(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow digits and limit to 10
+                    if (/^\d*$/.test(value) && value.length <= 10) {
+                      setVoterPhone(value);
+                    }
+                  }}
                   pattern="\d{10}"
                   maxLength={10}
                   title="Phone number must be exactly 10 digits"
