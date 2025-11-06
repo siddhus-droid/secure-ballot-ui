@@ -5,17 +5,23 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Vote, CheckCircle, AlertCircle, Clock, UserCheck, Users, Flag, Lightbulb, Building, ThumbsUp, ThumbsDown } from "lucide-react";
+import { CheckCircle, AlertCircle, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import ballotIcon from "@/assets/ballot-icon.jpg";
+import congressSymbol from "@/assets/congress-symbol.png";
+import bjpSymbol from "@/assets/bjp-symbol.png";
+import aapSymbol from "@/assets/aap-symbol.png";
+import buildingSymbol from "@/assets/building-symbol.png";
+import yesSymbol from "@/assets/yes-symbol.png";
+import noSymbol from "@/assets/no-symbol.png";
 
 interface Candidate {
   id: string;
   name: string;
   party: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  symbol: string;
 }
 
 interface Race {
@@ -48,21 +54,21 @@ const VotingBooth = () => {
           name: "Rajesh Kumar Sharma",
           party: "Indian National Congress",
           description: "Former Chief Minister focused on education and rural development",
-          icon: Users
+          symbol: congressSymbol
         },
         {
           id: "candidate-2",
           name: "Priya Patel",
           party: "Bharatiya Janata Party", 
           description: "Business leader advocating for economic growth and digital India",
-          icon: Flag
+          symbol: bjpSymbol
         },
         {
           id: "candidate-3",
           name: "Arjun Singh",
           party: "Aam Aadmi Party",
           description: "Reform candidate focused on anti-corruption and transparency",
-          icon: Lightbulb
+          symbol: aapSymbol
         }
       ]
     },
@@ -76,14 +82,14 @@ const VotingBooth = () => {
           name: "Sunita Devi",
           party: "Indian National Congress",
           description: "Former MLA with focus on infrastructure and women's empowerment",
-          icon: Users
+          symbol: congressSymbol
         },
         {
           id: "cm-2",
           name: "Vikram Reddy",
           party: "Bharatiya Janata Party",
           description: "Business leader advocating for industrial development",
-          icon: Building
+          symbol: buildingSymbol
         }
       ]
     },
@@ -97,14 +103,14 @@ const VotingBooth = () => {
           name: "YES",
           party: "Support",
           description: "Increase funding for government schools and universities",
-          icon: ThumbsUp
+          symbol: yesSymbol
         },
         {
           id: "ref-no",
           name: "NO",
           party: "Oppose",
           description: "Maintain current funding levels",
-          icon: ThumbsDown
+          symbol: noSymbol
         }
       ]
     }
@@ -399,30 +405,31 @@ const VotingBooth = () => {
               onValueChange={(value) => handleVoteChange(currentRace.id, value)}
               className="space-y-4"
             >
-              {currentRace.candidates.map((candidate) => {
-                const CandidateIcon = candidate.icon;
-                return (
-                  <div key={candidate.id} className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-government-gray/20 transition-colors">
-                    <RadioGroupItem value={candidate.id} id={candidate.id} className="mt-1" />
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="w-12 h-12 rounded-full bg-government-blue/10 flex items-center justify-center flex-shrink-0">
-                        <CandidateIcon className="h-6 w-6 text-government-blue" />
+              {currentRace.candidates.map((candidate) => (
+                <div key={candidate.id} className="flex items-start space-x-4 p-4 rounded-lg border hover:bg-government-gray/20 transition-colors">
+                  <RadioGroupItem value={candidate.id} id={candidate.id} className="mt-1" />
+                  <div className="flex items-center space-x-4 flex-1">
+                    <div className="w-20 h-20 rounded-lg bg-white shadow-sm flex items-center justify-center flex-shrink-0 p-2">
+                      <img 
+                        src={candidate.symbol} 
+                        alt={`${candidate.party} symbol`} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Label htmlFor={candidate.id} className="font-medium cursor-pointer text-base">
+                        {candidate.name}
+                      </Label>
+                      <div className="text-sm text-government-blue font-medium">
+                        {candidate.party}
                       </div>
-                      <div className="flex-1">
-                        <Label htmlFor={candidate.id} className="font-medium cursor-pointer">
-                          {candidate.name}
-                        </Label>
-                        <div className="text-sm text-government-blue font-medium">
-                          {candidate.party}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {candidate.description}
-                        </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {candidate.description}
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </RadioGroup>
           </CardContent>
         </Card>
