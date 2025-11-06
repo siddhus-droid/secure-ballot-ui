@@ -89,7 +89,7 @@ const VotingBooth = () => {
           name: "Vikram Reddy",
           party: "Bharatiya Janata Party",
           description: "Business leader advocating for industrial development",
-          symbol: buildingSymbol
+          symbol: bjpSymbol
         }
       ]
     },
