@@ -19,10 +19,28 @@ interface VerificationResult {
   }>;
 }
 
+interface Race {
+  id: string;
+  title: string;
+  description: string;
+  candidates: Array<{
+    id: string;
+    name: string;
+    party: string;
+    description: string;
+    symbol: string;
+  }>;
+}
+
 const Verification = () => {
   const { toast } = useToast();
   const location = useLocation();
-  const receiptData = location.state as { ballotId?: string; timestamp?: string } | null;
+  const receiptData = location.state as { 
+    ballotId?: string; 
+    timestamp?: string;
+    votes?: Record<string, string>;
+    races?: Race[];
+  } | null;
   const [showReceipt, setShowReceipt] = useState(!!receiptData?.ballotId);
   const [ballotId, setBallotId] = useState("");
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
@@ -42,30 +60,44 @@ const Verification = () => {
     
     // Simulate API call
     setTimeout(() => {
-      const mockResult: VerificationResult = {
-        ballotId: ballotId.toUpperCase(),
-        timestamp: "2024-11-05T14:30:25Z",
-        status: "verified",
-        races: [
-          {
-            title: "President of the United States",
-            selection: "John Anderson (Democratic Party)",
+      // Check if ballot ID matches the receipt data
+      const isMatchingBallot = receiptData?.ballotId === ballotId.toUpperCase();
+      
+      let verificationRaces = [];
+      
+      if (isMatchingBallot && receiptData?.votes && receiptData?.races) {
+        // Use actual vote data
+        verificationRaces = receiptData.races.map(race => {
+          const selectedCandidateId = receiptData.votes![race.id];
+          const selectedCandidate = race.candidates.find(c => c.id === selectedCandidateId);
+          
+          return {
+            title: race.title,
+            selection: selectedCandidate 
+              ? `${selectedCandidate.name} (${selectedCandidate.party})`
+              : "No selection",
             verified: true
-          },
+          };
+        });
+      } else {
+        // Fallback mock data for other ballot IDs
+        verificationRaces = [
           {
-            title: "Governor",
-            selection: "Maria Rodriguez (Democratic Party)",
-            verified: true
-          },
-          {
-            title: "Proposition 1: Education Funding",
-            selection: "YES (Support)",
+            title: "President of India",
+            selection: "Sample Candidate (Sample Party)",
             verified: true
           }
-        ]
+        ];
+      }
+      
+      const result: VerificationResult = {
+        ballotId: ballotId.toUpperCase(),
+        timestamp: receiptData?.timestamp || "2024-11-05T14:30:25Z",
+        status: "verified",
+        races: verificationRaces
       };
       
-      setVerificationResult(mockResult);
+      setVerificationResult(result);
       setIsSearching(false);
       
       toast({
@@ -254,7 +286,10 @@ Generated: ${new Date().toLocaleString()}
                   variant="government" 
                   size="lg" 
                   className="w-full"
-                  onClick={() => setShowReceipt(false)}
+                  onClick={() => {
+                    setShowReceipt(false);
+                    setBallotId(receiptData.ballotId || "");
+                  }}
                 >
                   Proceed to Verify Vote
                 </Button>

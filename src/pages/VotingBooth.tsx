@@ -395,7 +395,14 @@ const VotingBooth = () => {
                 variant="government" 
                 size="lg" 
                 className="w-full"
-                onClick={() => navigate("/verify", { state: { ballotId, timestamp: new Date().toISOString() } })}
+                onClick={() => navigate("/verify", { 
+                  state: { 
+                    ballotId, 
+                    timestamp: new Date().toISOString(),
+                    votes,
+                    races
+                  } 
+                })}
               >
                 View Receipt
               </Button>
