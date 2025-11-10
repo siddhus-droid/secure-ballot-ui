@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle, AlertCircle, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import ballotIcon from "@/assets/ballot-icon.jpg";
 import congressSymbol from "@/assets/congress-symbol.png";
 import bjpSymbol from "@/assets/bjp-symbol.png";
@@ -157,11 +158,55 @@ const VotingBooth = () => {
     setShowVoterDetails(true);
   };
 
-  const handleVoterDetailsSubmit = () => {
+  const handleVoterDetailsSubmit = async () => {
     if (!voterName.trim() || !voterPhone.trim()) {
       toast({
         title: "Details Required",
         description: "Please enter your name and phone number to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (voterPhone.length !== 10) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Phone number must be exactly 10 digits.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verify voter exists in database
+    const { data, error } = await supabase
+      .from('voters')
+      .select('*')
+      .eq('name', voterName.trim())
+      .eq('phone_number', voterPhone.trim())
+      .maybeSingle();
+
+    if (error) {
+      toast({
+        title: "Verification Error",
+        description: "Failed to verify your identity. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data) {
+      toast({
+        title: "Not Registered",
+        description: "No voter found with this name and phone number. Please register first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data.has_voted) {
+      toast({
+        title: "Already Voted",
+        description: "This voter has already cast their ballot.",
         variant: "destructive",
       });
       return;

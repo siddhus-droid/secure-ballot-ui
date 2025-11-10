@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserCheck, Shield, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const VoterRegistration = () => {
   const { toast } = useToast();
@@ -26,7 +27,7 @@ const VoterRegistration = () => {
     agreed: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.agreed) {
@@ -54,6 +55,33 @@ const VoterRegistration = () => {
         description: "You must be at least 18 years old to register to vote.",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Save voter to database
+    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+    const { error } = await supabase
+      .from('voters')
+      .insert({
+        name: fullName,
+        phone_number: formData.phone,
+        voter_id: formData.ssn
+      });
+
+    if (error) {
+      if (error.code === '23505') { // Unique constraint violation
+        toast({
+          title: "Registration Error",
+          description: "This phone number or Aadhar number is already registered.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Registration Error",
+          description: "Failed to register. Please try again.",
+          variant: "destructive",
+        });
+      }
       return;
     }
     
