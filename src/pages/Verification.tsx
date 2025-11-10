@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle, AlertCircle, Search, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "react-router-dom";
 
 interface VerificationResult {
   ballotId: string;
@@ -20,6 +21,9 @@ interface VerificationResult {
 
 const Verification = () => {
   const { toast } = useToast();
+  const location = useLocation();
+  const receiptData = location.state as { ballotId?: string; timestamp?: string } | null;
+  const [showReceipt, setShowReceipt] = useState(!!receiptData?.ballotId);
   const [ballotId, setBallotId] = useState("");
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -175,6 +179,100 @@ Generated: ${new Date().toLocaleString()}
         return null;
     }
   };
+
+  // Show receipt first if coming from voting
+  if (showReceipt && receiptData) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-success/10 p-3 rounded-full">
+                <CheckCircle className="h-8 w-8 text-success" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Vote Receipt</h1>
+            <p className="text-lg text-muted-foreground">
+              Your ballot has been successfully recorded
+            </p>
+          </div>
+
+          <Card className="shadow-government max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-center">Official Voting Receipt</CardTitle>
+              <CardDescription className="text-center">
+                Please save this information for verification
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-government-gray/30 rounded-lg p-6 space-y-4">
+                <div className="text-center border-b border-border pb-4">
+                  <p className="text-sm text-muted-foreground mb-2">Ballot ID</p>
+                  <p className="text-2xl font-mono font-bold text-government-blue">
+                    {receiptData.ballotId}
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Timestamp:</span>
+                    <div className="font-mono">
+                      {new Date(receiptData.timestamp || new Date()).toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Encryption:</span>
+                    <div className="font-semibold">AES-256 Applied</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Status:</span>
+                    <div className="font-semibold text-success">Recorded</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Blockchain:</span>
+                    <div className="font-semibold text-success">Confirmed</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-government-blue/5 rounded-lg p-4 text-sm">
+                <h3 className="font-semibold mb-2 flex items-center">
+                  <Shield className="h-4 w-4 mr-2 text-government-blue" />
+                  Important Information
+                </h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• Keep this Ballot ID safe for verification</li>
+                  <li>• You can verify your vote at any time using this ID</li>
+                  <li>• Your vote is encrypted and anonymous</li>
+                  <li>• Results will be available after election closes</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <Button 
+                  variant="government" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => setShowReceipt(false)}
+                >
+                  Proceed to Verify Vote
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => window.location.href = "/"}
+                >
+                  Return to Home
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-subtle py-8 px-4 sm:px-6 lg:px-8">

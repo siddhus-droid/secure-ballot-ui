@@ -43,6 +43,7 @@ const VotingBooth = () => {
   const [showVoterDetails, setShowVoterDetails] = useState(false);
   const [voterName, setVoterName] = useState("");
   const [voterPhone, setVoterPhone] = useState("");
+  const [ballotId, setBallotId] = useState("");
 
   const races: Race[] = [
     {
@@ -137,7 +138,9 @@ const VotingBooth = () => {
     if (currentRaceIndex < races.length - 1) {
       setCurrentRaceIndex(prev => prev + 1);
     } else {
-      // Complete voting
+      // Complete voting and generate ballot ID
+      const generatedBallotId = `VT-2024-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      setBallotId(generatedBallotId);
       setIsVotingComplete(true);
       toast({
         title: "Ballot Cast Successfully",
@@ -381,7 +384,7 @@ const VotingBooth = () => {
             <div className="bg-government-gray/30 rounded-lg p-6">
               <h3 className="font-semibold mb-2">Confirmation Details</h3>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>Ballot ID: #VT-2024-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+                <p>Ballot ID: #{ballotId}</p>
                 <p>Timestamp: {new Date().toLocaleString()}</p>
                 <p>Encryption: AES-256 Applied</p>
               </div>
@@ -392,7 +395,7 @@ const VotingBooth = () => {
                 variant="government" 
                 size="lg" 
                 className="w-full"
-                onClick={() => navigate("/verify")}
+                onClick={() => navigate("/verify", { state: { ballotId, timestamp: new Date().toISOString() } })}
               >
                 View Receipt
               </Button>
