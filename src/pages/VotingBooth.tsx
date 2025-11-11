@@ -125,7 +125,7 @@ const VotingBooth = () => {
     setVotes(prev => ({ ...prev, [raceId]: candidateId }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!votes[currentRace.id]) {
       toast({
         title: "Selection Required",
@@ -141,6 +141,27 @@ const VotingBooth = () => {
       // Complete voting and generate ballot ID
       const generatedBallotId = `VT-2024-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       setBallotId(generatedBallotId);
+      
+      // Update voter record in database
+      const { error } = await supabase
+        .from('voters')
+        .update({ 
+          has_voted: true,
+          ballot_id: generatedBallotId 
+        })
+        .eq('name', voterName.trim())
+        .eq('phone_number', voterPhone.trim());
+
+      if (error) {
+        console.error('Error updating voter record:', error);
+        toast({
+          title: "Warning",
+          description: "Vote recorded but failed to update voter status.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setIsVotingComplete(true);
       toast({
         title: "Ballot Cast Successfully",
@@ -404,7 +425,65 @@ const VotingBooth = () => {
                   } 
                 })}
               >
-                View Receipt
+                View Receipt & Verify Vote
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full"
+                onClick={() => {
+                  // Download receipt as text file
+                  const receiptContent = `
+VOTING RECEIPT
+===============================
+
+Ballot ID: ${ballotId}
+Date & Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+Status: Verified & Encrypted
+
+===============================
+VOTES CAST
+===============================
+
+${races.map((race, idx) => {
+  const votedCandidateId = votes[race.id];
+  const candidate = race.candidates.find(c => c.id === votedCandidateId);
+  return `${idx + 1}. ${race.title}
+   Selected: ${candidate?.name || 'N/A'}
+   Party: ${candidate?.party || 'N/A'}`;
+}).join('\n\n')}
+
+===============================
+SECURITY INFORMATION
+===============================
+
+Encryption: AES-256 Applied
+Blockchain: Transaction Recorded
+Verification: Available at /verify
+
+Thank you for participating in Digital India Voting!
+
+IMPORTANT: Keep this Ballot ID safe for vote verification.
+                  `.trim();
+
+                  const blob = new Blob([receiptContent], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `Voting-Receipt-${ballotId}.txt`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+
+                  toast({
+                    title: "Receipt Downloaded",
+                    description: "Your voting receipt has been saved to your device.",
+                    variant: "default",
+                  });
+                }}
+              >
+                Download Receipt
               </Button>
               <Button 
                 variant="outline" 

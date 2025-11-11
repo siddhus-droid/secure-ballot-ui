@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       voters: {
         Row: {
+          ballot_id: string | null
           created_at: string
           has_voted: boolean | null
           id: string
@@ -24,6 +25,7 @@ export type Database = {
           voter_id: string | null
         }
         Insert: {
+          ballot_id?: string | null
           created_at?: string
           has_voted?: boolean | null
           id?: string
@@ -32,6 +34,7 @@ export type Database = {
           voter_id?: string | null
         }
         Update: {
+          ballot_id?: string | null
           created_at?: string
           has_voted?: boolean | null
           id?: string

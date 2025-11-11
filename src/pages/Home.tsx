@@ -13,8 +13,7 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6">
-                Digital India
-                <span className="bg-gradient-patriotic bg-clip-text text-transparent"> Voting</span>
+                Digital India Voting
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Experience the future of democracy in India. Secure, transparent, and 

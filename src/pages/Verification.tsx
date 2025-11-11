@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle, AlertCircle, Search, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VerificationResult {
   ballotId: string;
@@ -45,67 +46,161 @@ const Verification = () => {
   const [ballotId, setBallotId] = useState("");
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [showLostReceipt, setShowLostReceipt] = useState(false);
+  const [lostReceiptName, setLostReceiptName] = useState("");
+  const [lostReceiptPhone, setLostReceiptPhone] = useState("");
+  const [foundBallotId, setFoundBallotId] = useState("");
 
   const handleVerify = async () => {
     if (!ballotId.trim()) {
       toast({
-        title: "Ballot ID Required",
-        description: "Please enter your ballot ID to verify your vote.",
+        title: "Input Required",
+        description: "Please enter your Ballot ID to verify your vote.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSearching(true);
+    
+    // Check if ballot ID exists in database
+    const { data: voterData, error } = await supabase
+      .from('voters')
+      .select('*')
+      .eq('ballot_id', ballotId.toUpperCase())
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error verifying ballot:', error);
+      setIsSearching(false);
+      toast({
+        title: "Verification Error",
+        description: "Failed to verify ballot. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!voterData) {
+      setIsSearching(false);
+      toast({
+        title: "Invalid Ballot ID",
+        description: "The ballot ID you entered does not exist. Please check and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if ballot ID matches the receipt data
+    const isMatchingBallot = receiptData?.ballotId === ballotId.toUpperCase();
+    
+    let verificationRaces = [];
+    
+    if (isMatchingBallot && receiptData?.votes && receiptData?.races) {
+      // Use actual vote data from receipt
+      verificationRaces = receiptData.races.map(race => {
+        const selectedCandidateId = receiptData.votes![race.id];
+        const selectedCandidate = race.candidates.find(c => c.id === selectedCandidateId);
+        
+        return {
+          title: race.title,
+          selection: selectedCandidate 
+            ? `${selectedCandidate.name} (${selectedCandidate.party})`
+            : "No selection",
+          verified: true
+        };
+      });
+    } else {
+      // Ballot exists but we don't have vote details
+      verificationRaces = [
+        {
+          title: "Vote Verified",
+          selection: "Your vote has been recorded and verified in the system",
+          verified: true
+        }
+      ];
+    }
+    
+    const result: VerificationResult = {
+      ballotId: ballotId.toUpperCase(),
+      timestamp: receiptData?.timestamp || new Date().toISOString(),
+      status: "verified",
+      races: verificationRaces
+    };
+    
+    setVerificationResult(result);
+    setIsSearching(false);
+    
+    toast({
+      title: "Verification Complete",
+      description: "Your ballot has been successfully verified.",
+      variant: "default",
+    });
+  };
+
+  const handleLostReceiptLookup = async () => {
+    if (!lostReceiptName.trim() || !lostReceiptPhone.trim()) {
+      toast({
+        title: "Details Required",
+        description: "Please enter both your name and phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (lostReceiptPhone.length !== 10) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Phone number must be exactly 10 digits.",
         variant: "destructive",
       });
       return;
     }
 
     setIsSearching(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Check if ballot ID matches the receipt data
-      const isMatchingBallot = receiptData?.ballotId === ballotId.toUpperCase();
-      
-      let verificationRaces = [];
-      
-      if (isMatchingBallot && receiptData?.votes && receiptData?.races) {
-        // Use actual vote data
-        verificationRaces = receiptData.races.map(race => {
-          const selectedCandidateId = receiptData.votes![race.id];
-          const selectedCandidate = race.candidates.find(c => c.id === selectedCandidateId);
-          
-          return {
-            title: race.title,
-            selection: selectedCandidate 
-              ? `${selectedCandidate.name} (${selectedCandidate.party})`
-              : "No selection",
-            verified: true
-          };
-        });
-      } else {
-        // Fallback mock data for other ballot IDs
-        verificationRaces = [
-          {
-            title: "President of India",
-            selection: "Sample Candidate (Sample Party)",
-            verified: true
-          }
-        ];
-      }
-      
-      const result: VerificationResult = {
-        ballotId: ballotId.toUpperCase(),
-        timestamp: receiptData?.timestamp || "2024-11-05T14:30:25Z",
-        status: "verified",
-        races: verificationRaces
-      };
-      
-      setVerificationResult(result);
-      setIsSearching(false);
-      
+
+    const { data, error } = await supabase
+      .from('voters')
+      .select('ballot_id, has_voted')
+      .eq('name', lostReceiptName.trim())
+      .eq('phone_number', lostReceiptPhone.trim())
+      .maybeSingle();
+
+    setIsSearching(false);
+
+    if (error) {
       toast({
-        title: "Verification Complete",
-        description: "Your ballot has been successfully verified in the blockchain.",
-        variant: "default",
+        title: "Lookup Error",
+        description: "Failed to find your voting record. Please try again.",
+        variant: "destructive",
       });
-    }, 2000);
+      return;
+    }
+
+    if (!data) {
+      toast({
+        title: "Not Found",
+        description: "No voter found with this name and phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data.has_voted || !data.ballot_id) {
+      toast({
+        title: "No Vote Recorded",
+        description: "You have not cast your vote yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFoundBallotId(data.ballot_id);
+    toast({
+      title: "Ballot ID Found",
+      description: "Your ballot ID has been retrieved successfully.",
+      variant: "default",
+    });
   };
 
   const handleDownloadCertificate = () => {
@@ -211,6 +306,98 @@ Generated: ${new Date().toLocaleString()}
         return null;
     }
   };
+
+  // Show lost receipt lookup
+  if (showLostReceipt) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <Card className="shadow-government">
+            <CardHeader>
+              <div className="mx-auto w-16 h-16 bg-government-blue/10 rounded-full flex items-center justify-center mb-4">
+                <AlertCircle className="h-8 w-8 text-government-blue" />
+              </div>
+              <CardTitle className="text-2xl text-center">Lost Receipt Lookup</CardTitle>
+              <CardDescription className="text-center">
+                Enter your registered details to retrieve your Ballot ID
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="lostName">Full Name (as registered)</Label>
+                  <Input
+                    id="lostName"
+                    placeholder="Enter your full name"
+                    value={lostReceiptName}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^[A-Za-z\s]*$/.test(value)) {
+                        setLostReceiptName(value);
+                      }
+                    }}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lostPhone">Phone Number</Label>
+                  <Input
+                    id="lostPhone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={lostReceiptPhone}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value) && value.length <= 10) {
+                        setLostReceiptPhone(value);
+                      }
+                    }}
+                    maxLength={10}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              {foundBallotId && (
+                <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+                  <p className="text-sm font-medium text-success mb-2">Your Ballot ID:</p>
+                  <p className="text-2xl font-bold text-foreground font-mono">{foundBallotId}</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Use this ID to verify your vote below
+                  </p>
+                </div>
+              )}
+
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => {
+                    setShowLostReceipt(false);
+                    setFoundBallotId("");
+                    setLostReceiptName("");
+                    setLostReceiptPhone("");
+                  }}
+                >
+                  Back
+                </Button>
+                <Button 
+                  variant="government" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleLostReceiptLookup}
+                  disabled={isSearching}
+                >
+                  {isSearching ? "Searching..." : "Find Ballot ID"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Show receipt first if coming from voting
   if (showReceipt && receiptData) {
@@ -343,9 +530,17 @@ Generated: ${new Date().toLocaleString()}
                       id="ballotId"
                       placeholder="e.g., VT-2024-ABC123XYZ"
                       value={ballotId}
-                      onChange={(e) => setBallotId(e.target.value)}
+                      onChange={(e) => setBallotId(e.target.value.toUpperCase())}
                       className="font-mono"
                     />
+                    <Button 
+                      variant="link" 
+                      size="sm"
+                      onClick={() => setShowLostReceipt(true)}
+                      className="text-government-blue p-0 h-auto"
+                    >
+                      Lost your receipt? Click here to retrieve your Ballot ID
+                    </Button>
                   </div>
                   <Button 
                     onClick={handleVerify}
@@ -503,10 +698,14 @@ Generated: ${new Date().toLocaleString()}
                     Lost Your Receipt?
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Contact support for assistance with ballot lookup
+                    Retrieve your Ballot ID using your registered details
                   </p>
-                  <Button variant="outline" size="sm">
-                    Contact Support
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowLostReceipt(true)}
+                  >
+                    Find My Ballot ID
                   </Button>
                 </div>
               </CardContent>
