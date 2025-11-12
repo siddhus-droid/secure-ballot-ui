@@ -43,6 +43,7 @@ const VotingBooth = () => {
   const [showVoterDetails, setShowVoterDetails] = useState(false);
   const [voterName, setVoterName] = useState("");
   const [voterPhone, setVoterPhone] = useState("");
+  const [voterAadhar, setVoterAadhar] = useState("");
   const [ballotId, setBallotId] = useState("");
 
   const races: Race[] = [
@@ -183,10 +184,10 @@ const VotingBooth = () => {
   };
 
   const handleVoterDetailsSubmit = async () => {
-    if (!voterName.trim() || !voterPhone.trim()) {
+    if (!voterName.trim() || !voterPhone.trim() || !voterAadhar.trim()) {
       toast({
         title: "Details Required",
-        description: "Please enter your name and phone number to continue.",
+        description: "Please enter your name, phone number, and Aadhar number to continue.",
         variant: "destructive",
       });
       return;
@@ -201,12 +202,22 @@ const VotingBooth = () => {
       return;
     }
 
+    if (voterAadhar.length !== 12) {
+      toast({
+        title: "Invalid Aadhar Number",
+        description: "Aadhar number must be exactly 12 digits.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Verify voter exists in database
     const { data, error } = await supabase
       .from('voters')
       .select('*')
       .eq('name', voterName.trim())
       .eq('phone_number', voterPhone.trim())
+      .eq('aadhar_number', voterAadhar.trim())
       .maybeSingle();
 
     if (error) {
@@ -355,6 +366,27 @@ const VotingBooth = () => {
                   required
                 />
               </div>
+              <div>
+                <Label htmlFor="voterAadhar">Aadhar Number</Label>
+                <Input
+                  id="voterAadhar"
+                  type="tel"
+                  placeholder="Enter your 12-digit Aadhar number"
+                  value={voterAadhar}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow digits and limit to 12
+                    if (/^\d*$/.test(value) && value.length <= 12) {
+                      setVoterAadhar(value);
+                    }
+                  }}
+                  pattern="\d{12}"
+                  maxLength={12}
+                  title="Aadhar number must be exactly 12 digits"
+                  className="mt-1"
+                  required
+                />
+              </div>
             </div>
             
             <div className="flex space-x-3">
@@ -432,7 +464,7 @@ const VotingBooth = () => {
                 size="lg" 
                 className="w-full"
                 onClick={() => {
-                  // Download receipt as text file
+                  // Download receipt as text file - PRIVACY: Do not include candidate/party information
                   const receiptContent = `
 VOTING RECEIPT
 ===============================
@@ -442,16 +474,11 @@ Date & Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
 Status: Verified & Encrypted
 
 ===============================
-VOTES CAST
+VOTE CONFIRMATION
 ===============================
 
-${races.map((race, idx) => {
-  const votedCandidateId = votes[race.id];
-  const candidate = race.candidates.find(c => c.id === votedCandidateId);
-  return `${idx + 1}. ${race.title}
-   Selected: ${candidate?.name || 'N/A'}
-   Party: ${candidate?.party || 'N/A'}`;
-}).join('\n\n')}
+Your vote has been successfully recorded and encrypted.
+Vote details are kept private to ensure ballot secrecy.
 
 ===============================
 SECURITY INFORMATION

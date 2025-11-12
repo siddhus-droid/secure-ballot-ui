@@ -49,6 +49,7 @@ const Verification = () => {
   const [showLostReceipt, setShowLostReceipt] = useState(false);
   const [lostReceiptName, setLostReceiptName] = useState("");
   const [lostReceiptPhone, setLostReceiptPhone] = useState("");
+  const [lostReceiptAadhar, setLostReceiptAadhar] = useState("");
   const [foundBallotId, setFoundBallotId] = useState("");
 
   const handleVerify = async () => {
@@ -96,30 +97,15 @@ const Verification = () => {
     
     let verificationRaces = [];
     
-    if (isMatchingBallot && receiptData?.votes && receiptData?.races) {
-      // Use actual vote data from receipt
-      verificationRaces = receiptData.races.map(race => {
-        const selectedCandidateId = receiptData.votes![race.id];
-        const selectedCandidate = race.candidates.find(c => c.id === selectedCandidateId);
-        
-        return {
-          title: race.title,
-          selection: selectedCandidate 
-            ? `${selectedCandidate.name} (${selectedCandidate.party})`
-            : "No selection",
-          verified: true
-        };
-      });
-    } else {
-      // Ballot exists but we don't have vote details
-      verificationRaces = [
-        {
-          title: "Vote Verified",
-          selection: "Your vote has been recorded and verified in the system",
-          verified: true
-        }
-      ];
-    }
+    // PRIVACY: Never show candidate/party information in verification
+    // Only confirm that the vote was recorded
+    verificationRaces = [
+      {
+        title: "Vote Verified",
+        selection: "Your vote has been recorded and verified in the system",
+        verified: true
+      }
+    ];
     
     const result: VerificationResult = {
       ballotId: ballotId.toUpperCase(),
@@ -139,10 +125,10 @@ const Verification = () => {
   };
 
   const handleLostReceiptLookup = async () => {
-    if (!lostReceiptName.trim() || !lostReceiptPhone.trim()) {
+    if (!lostReceiptName.trim() || !lostReceiptPhone.trim() || !lostReceiptAadhar.trim()) {
       toast({
         title: "Details Required",
-        description: "Please enter both your name and phone number.",
+        description: "Please enter your name, phone number, and Aadhar number.",
         variant: "destructive",
       });
       return;
@@ -157,13 +143,23 @@ const Verification = () => {
       return;
     }
 
+    if (lostReceiptAadhar.length !== 12) {
+      toast({
+        title: "Invalid Aadhar Number",
+        description: "Aadhar number must be exactly 12 digits.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSearching(true);
 
     const { data, error } = await supabase
       .from('voters')
-      .select('ballot_id, has_voted')
+      .select('ballot_id, has_voted, aadhar_number')
       .eq('name', lostReceiptName.trim())
       .eq('phone_number', lostReceiptPhone.trim())
+      .eq('aadhar_number', lostReceiptAadhar.trim())
       .maybeSingle();
 
     setIsSearching(false);
@@ -206,7 +202,7 @@ const Verification = () => {
   const handleDownloadCertificate = () => {
     if (!verificationResult) return;
 
-    // Create certificate content
+    // Create certificate content - PRIVACY: Do not include candidate/party information
     const certificateContent = `
 OFFICIAL VOTE VERIFICATION CERTIFICATE
 ======================================
@@ -219,12 +215,9 @@ Block Hash: 0x4f3c2b1a9e8d7c6b5a4f3e2d1c0b9a8e7d6c5b4a
 Transaction ID: tx_789abc456def123ghi
 Confirmations: 24/24
 
-RECORDED VOTES:
-${verificationResult.races.map((race, i) => `
-${i + 1}. ${race.title}
-   Selection: ${race.selection}
-   Verified: ${race.verified ? 'YES' : 'NO'}
-`).join('')}
+VOTE VERIFICATION:
+Your vote has been successfully recorded and verified in the system.
+Vote details are kept private to ensure ballot secrecy.
 
 This certificate confirms that your vote was securely recorded 
 on the blockchain and cannot be altered.
@@ -356,6 +349,23 @@ Generated: ${new Date().toLocaleString()}
                     className="mt-1"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="lostAadhar">Aadhar Number</Label>
+                  <Input
+                    id="lostAadhar"
+                    type="tel"
+                    placeholder="Enter your 12-digit Aadhar number"
+                    value={lostReceiptAadhar}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value) && value.length <= 12) {
+                        setLostReceiptAadhar(value);
+                      }
+                    }}
+                    maxLength={12}
+                    className="mt-1"
+                  />
+                </div>
               </div>
 
               {foundBallotId && (
@@ -378,6 +388,7 @@ Generated: ${new Date().toLocaleString()}
                     setFoundBallotId("");
                     setLostReceiptName("");
                     setLostReceiptPhone("");
+                    setLostReceiptAadhar("");
                   }}
                 >
                   Back

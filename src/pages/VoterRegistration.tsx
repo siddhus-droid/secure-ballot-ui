@@ -65,7 +65,8 @@ const VoterRegistration = () => {
       .insert({
         name: fullName,
         phone_number: formData.phone,
-        voter_id: formData.ssn
+        voter_id: formData.ssn,
+        aadhar_number: formData.ssn
       });
 
     if (error) {

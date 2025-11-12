@@ -1,9 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Vote, Shield, BarChart3, UserCheck, Home, HelpCircle } from "lucide-react";
+import { Vote, Shield, BarChart3, UserCheck, Home, HelpCircle, Languages } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Navigation = () => {
   const location = useLocation();
+  const { language, setLanguage, t } = useLanguage();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -24,7 +27,7 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <Home className="h-4 w-4" />
-                <span>Home</span>
+                <span>{t('nav.home')}</span>
               </Button>
             </Link>
             
@@ -35,7 +38,7 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <UserCheck className="h-4 w-4" />
-                <span>Register</span>
+                <span>{t('nav.register')}</span>
               </Button>
             </Link>
             
@@ -46,7 +49,7 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <Vote className="h-4 w-4" />
-                <span>Vote</span>
+                <span>{t('nav.vote')}</span>
               </Button>
             </Link>
             
@@ -57,7 +60,7 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <BarChart3 className="h-4 w-4" />
-                <span>Results</span>
+                <span>{t('nav.results')}</span>
               </Button>
             </Link>
             
@@ -68,7 +71,7 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <Shield className="h-4 w-4" />
-                <span>Verify</span>
+                <span>{t('nav.verify')}</span>
               </Button>
             </Link>
             
@@ -79,9 +82,22 @@ const Navigation = () => {
                 className="flex items-center space-x-1"
               >
                 <HelpCircle className="h-4 w-4" />
-                <span>Help</span>
+                <span>{t('nav.help')}</span>
               </Button>
             </Link>
+            
+            <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
+              <Languages className="h-4 w-4 text-muted-foreground" />
+              <Select value={language} onValueChange={(value: 'en' | 'hi') => setLanguage(value)}>
+                <SelectTrigger className="w-[100px] h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-50">
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="hi">हिंदी</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
